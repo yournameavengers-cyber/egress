@@ -7,10 +7,10 @@ import { getReminderByMagicHash, cancelReminder } from '@/lib/db';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hash: string } }
+  { params }: { params: Promise<{ hash: string }> }
 ) {
   try {
-    const { hash } = params;
+    const { hash } = await params;
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action'); // 'delete' or null (defaults to cancel)
 
