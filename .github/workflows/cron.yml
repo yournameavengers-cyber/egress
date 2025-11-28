@@ -1,0 +1,31 @@
+name: Process Egress Reminders
+
+on:
+  schedule:
+    # Run every 10 minutes
+    # Note: GitHub Actions has a minimum interval of 5 minutes for scheduled workflows
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual triggering from GitHub UI
+
+jobs:
+  process-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cron Endpoint
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X GET "${{ secrets.APP_URL }}/api/cron" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" -ne 200 ]; then
+            echo "Cron job failed with status $http_code"
+            exit 1
+          fi
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+

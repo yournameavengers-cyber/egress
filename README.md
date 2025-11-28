@@ -85,11 +85,28 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Add all environment variables in Vercel dashboard
 4. Deploy
 
-The cron job will automatically be set up via `vercel.json` and will run every 10 minutes.
+**Note:** Vercel Hobby plan has limitations on cron jobs. We use GitHub Actions instead (see below).
 
-### Cron Job Setup
+### Cron Job Setup (GitHub Actions - Free Alternative)
 
-The cron job is configured in `vercel.json` to run every 10 minutes. Make sure to set the `CRON_SECRET` environment variable in Vercel, and add it to the cron job configuration in the Vercel dashboard.
+Since Vercel Hobby plan has cron limitations, we use GitHub Actions to trigger the cron endpoint:
+
+1. **Set up GitHub Secrets:**
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Add the following secrets:
+     - `APP_URL`: Your deployed Vercel URL (e.g., `https://your-app.vercel.app`)
+     - `CRON_SECRET`: The same secret you set in Vercel environment variables
+
+2. **Enable GitHub Actions:**
+   - The workflow file (`.github/workflows/cron.yml`) is already configured
+   - GitHub Actions will automatically run every 10 minutes
+   - You can also manually trigger it from the Actions tab
+
+3. **Alternative: External Cron Service (if needed):**
+   - You can use services like [cron-job.org](https://cron-job.org) (free tier available)
+   - Set it to call: `GET https://your-app.vercel.app/api/cron`
+   - Add header: `Authorization: Bearer YOUR_CRON_SECRET`
+   - Schedule: Every 10 minutes
 
 ## Project Structure
 
@@ -110,7 +127,10 @@ egress/
 │   └── utils.ts             # Utility functions
 ├── supabase/
 │   └── migrations/          # Database migrations
-└── vercel.json              # Vercel cron configuration
+├── .github/
+│   └── workflows/
+│       └── cron.yml         # GitHub Actions cron workflow
+└── vercel.json              # Vercel configuration
 ```
 
 ## Key Features Explained

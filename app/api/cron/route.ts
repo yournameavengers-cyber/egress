@@ -11,18 +11,26 @@ import { sendEgressReminder } from '@/lib/email';
  * Processes pending reminders that are ready to be sent
  */
 export async function GET(request: NextRequest) {
-  // Verify the request is from Vercel Cron
-  // Vercel sends a 'x-vercel-cron' header, or you can use CRON_SECRET
+  // Verify the request is authorized
+  // Supports: Vercel Cron (x-vercel-cron header), GitHub Actions, or CRON_SECRET
   const cronSecret = request.headers.get('authorization');
   const vercelCronHeader = request.headers.get('x-vercel-cron');
+  const userAgent = request.headers.get('user-agent') || '';
   
-  // Allow if it's from Vercel Cron OR if CRON_SECRET matches
-  if (!vercelCronHeader && cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
-    // In production, you might want to be stricter
-    // For now, we'll allow it but log a warning
+  // Allow if:
+  // 1. It's from Vercel Cron (has x-vercel-cron header)
+  // 2. It's from GitHub Actions (user-agent contains GitHub Actions)
+  // 3. Authorization header matches CRON_SECRET
+  const isVercelCron = !!vercelCronHeader;
+  const isGitHubActions = userAgent.includes('GitHub Actions');
+  const isValidSecret = cronSecret === `Bearer ${process.env.CRON_SECRET}`;
+  
+  if (!isVercelCron && !isGitHubActions && !isValidSecret) {
     if (process.env.NODE_ENV === 'production') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    // In development, allow but log a warning
+    console.warn('Cron endpoint called without proper authorization');
   }
 
   try {
