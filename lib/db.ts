@@ -10,7 +10,7 @@ function getSupabaseClient(): SupabaseClient {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase URL and anon key are required');
+      throw new Error('Supabase URL and anon key are required. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
     }
     
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
@@ -24,7 +24,7 @@ function getSupabaseAdminClient(): SupabaseClient {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Supabase URL and service role key are required');
+      throw new Error('Supabase URL and service role key are required. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.');
     }
     
     supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
@@ -38,18 +38,12 @@ function getSupabaseAdminClient(): SupabaseClient {
 }
 
 // Client for client-side operations (uses anon key)
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    return getSupabaseClient()[prop as keyof SupabaseClient];
-  }
-});
+// Exported for potential client-side use, but functions use getSupabaseClient()
+export const supabase = getSupabaseClient();
 
 // Admin client for server-side operations (uses service role key)
-export const supabaseAdmin = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    return getSupabaseAdminClient()[prop as keyof SupabaseClient];
-  }
-});
+// Exported for potential direct use, but functions use getSupabaseAdminClient()
+export const supabaseAdmin = getSupabaseAdminClient();
 
 export type ReminderStatus = 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
 
@@ -79,7 +73,8 @@ export interface CreateReminderInput {
  * Creates a new reminder in the database
  */
 export async function createReminder(input: CreateReminderInput): Promise<Reminder> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .insert({
       user_email: input.user_email.trim().toLowerCase(),
@@ -105,7 +100,8 @@ export async function createReminder(input: CreateReminderInput): Promise<Remind
  * (egress_trigger_utc <= NOW() and status = 'pending')
  */
 export async function getPendingReminders(): Promise<Reminder[]> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .select('*')
     .eq('status', 'pending')
@@ -126,7 +122,8 @@ export async function updateReminderStatus(
   id: string,
   status: ReminderStatus
 ): Promise<Reminder> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .update({ status })
     .eq('id', id)
@@ -145,7 +142,8 @@ export async function updateReminderStatus(
  * Only updates if current status is 'pending'
  */
 export async function lockReminderForProcessing(id: string): Promise<Reminder | null> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .update({ status: 'processing' })
     .eq('id', id)
@@ -168,7 +166,8 @@ export async function lockReminderForProcessing(id: string): Promise<Reminder | 
  * Gets a reminder by magic hash (for cancellation)
  */
 export async function getReminderByMagicHash(magicHash: string): Promise<Reminder | null> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .select('*')
     .eq('magic_hash', magicHash)
@@ -188,7 +187,8 @@ export async function getReminderByMagicHash(magicHash: string): Promise<Reminde
  * Cancels a reminder by setting status to 'cancelled'
  */
 export async function cancelReminder(id: string): Promise<Reminder> {
-  const { data, error } = await supabaseAdmin
+  const client = getSupabaseAdminClient();
+  const { data, error } = await client
     .from('reminders')
     .update({ status: 'cancelled' })
     .eq('id', id)
