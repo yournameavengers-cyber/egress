@@ -118,9 +118,9 @@ export default function EgressInterface() {
   };
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center font-sans text-white selection:bg-cyan-500/30">
+    <div className="relative w-full min-h-screen bg-black overflow-y-auto flex items-center justify-center font-sans text-white selection:bg-cyan-500/30 py-12 md:py-20">
       {/* 1. ATMOSPHERE: The Sora-style Aurora Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-900/30 rounded-full blur-[120px] mix-blend-screen animate-pulse-slow" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] bg-cyan-900/20 rounded-full blur-[100px] mix-blend-screen" />
         {/* Noise overlay for texture */}
@@ -130,65 +130,70 @@ export default function EgressInterface() {
       </div>
 
       {/* 2. THE LENS: The Glass Interface */}
-      <div className="relative z-10 w-full max-w-2xl px-6">
+      <div className="relative z-10 w-full max-w-2xl px-6 py-8">
         <AnimatePresence mode="wait">
           {step === 'input' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-              className="space-y-12"
+              className="space-y-8 md:space-y-12"
             >
               {/* Header */}
-              <div className="flex items-center justify-between opacity-50 mb-12">
+              <div className="flex items-center justify-between mb-8 md:mb-12">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-xs tracking-[0.2em] font-mono uppercase">Egress Protocol v1.0</span>
+                  <span className="text-sm md:text-base tracking-[0.2em] font-mono uppercase text-white/80">Egress Protocol v1.0</span>
                 </div>
                 {timezone && (
-                  <span className="text-xs tracking-[0.2em] font-mono uppercase text-white/30">
+                  <span className="text-sm md:text-base tracking-[0.2em] font-mono uppercase text-white/70">
                     {timezone}
                   </span>
                 )}
               </div>
 
               {/* The "Sentence Builder" */}
-              <div className="text-3xl md:text-5xl leading-[1.4] font-light tracking-tight text-white/90">
-                <span>I need to escape from </span>
-                <span className="relative inline-block group">
-                  <input
-                    type="text"
-                    name="service"
-                    placeholder="Subscription Name"
-                    value={formData.service}
-                    onChange={handleInput}
-                    className="bg-transparent border-b border-white/20 text-cyan-200 placeholder-white/10 focus:outline-none focus:border-cyan-400 w-[7ch] min-w-[300px] transition-all font-mono text-3xl md:text-5xl"
-                    autoComplete="off"
-                  />
-                </span>
-                <br className="hidden md:block" />
-                <span> before </span>
-                <span className="relative inline-block">
-                  <input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleDateChange}
-                    className="bg-transparent border-b border-white/20 text-cyan-200 placeholder-white/10 focus:outline-none focus:border-cyan-400 min-w-[200px] transition-all font-mono uppercase text-3xl md:text-5xl"
-                  />
-                </span>
-                <span>.</span>
-                <br className="hidden md:block" />
-                <div className="mt-4 md:mt-0 inline-block">
-                  <span>Send the signal to </span>
-                  <span className="relative inline-block">
+              <div className="text-3xl md:text-5xl leading-[1.5] font-light tracking-tight text-white/90 space-y-4 md:space-y-6">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span>I need to escape from</span>
+                  <span className="relative inline-block min-w-[280px] md:min-w-[350px]">
+                    <input
+                      type="text"
+                      name="service"
+                      placeholder="Subscription Name"
+                      value={formData.service}
+                      onChange={handleInput}
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
+                      autoComplete="off"
+                    />
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span>before</span>
+                  <span className="relative inline-block min-w-[200px] md:min-w-[250px]">
+                    <input
+                      type="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={handleDateChange}
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
+                      style={{
+                        colorScheme: 'dark'
+                      }}
+                    />
+                  </span>
+                  <span>.</span>
+                </div>
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span>Send the signal to</span>
+                  <span className="relative inline-block min-w-[280px] md:min-w-[350px]">
                     <input
                       type="email"
                       name="email"
                       placeholder="my@email.com"
                       value={formData.email}
                       onChange={handleInput}
-                      className="bg-transparent border-b border-white/20 text-cyan-200 placeholder-white/10 focus:outline-none focus:border-cyan-400 w-[300px] transition-all font-mono text-3xl md:text-5xl"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
                     />
                   </span>
                   <span>.</span>
@@ -220,28 +225,28 @@ export default function EgressInterface() {
               )}
 
               {/* Safe Mode Toggle */}
-              <div className="flex items-center space-x-3 pt-4">
+              <div className="flex items-center space-x-3 pt-6">
                 <input
                   type="checkbox"
                   id="safeMode"
                   checked={safeMode}
                   onChange={(e) => setSafeMode(e.target.checked)}
-                  className="w-4 h-4 bg-transparent border-white/20 rounded focus:ring-cyan-400"
+                  className="w-4 h-4 bg-transparent border-white/20 rounded focus:ring-cyan-400 cursor-pointer"
                 />
-                <label htmlFor="safeMode" className="text-sm text-white/60 font-mono">
+                <label htmlFor="safeMode" className="text-sm text-white/60 font-mono cursor-pointer">
                   Safe Mode (assume trial ends at 00:00:01)
                 </label>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="text-red-400 text-sm font-mono">
+                <div className="text-red-400 text-sm font-mono pt-2">
                   {error}
                 </div>
               )}
 
               {/* The Trigger Button */}
-              <div className="pt-8">
+              <div className="pt-8 pb-4">
                 <button
                   onClick={handleArm}
                   disabled={!formData.service || !formData.date || !formData.email}
