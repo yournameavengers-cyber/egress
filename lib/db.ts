@@ -38,12 +38,9 @@ function getSupabaseAdminClient(): SupabaseClient {
 }
 
 // Client for client-side operations (uses anon key)
-// Exported for potential client-side use, but functions use getSupabaseClient()
-export const supabase = getSupabaseClient();
-
-// Admin client for server-side operations (uses service role key)
-// Exported for potential direct use, but functions use getSupabaseAdminClient()
-export const supabaseAdmin = getSupabaseAdminClient();
+// Note: These are only initialized when actually used (lazy loading)
+// For server-side operations, use the getSupabaseAdminClient() function
+export { getSupabaseClient as supabase, getSupabaseAdminClient as supabaseAdmin };
 
 export type ReminderStatus = 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
 
