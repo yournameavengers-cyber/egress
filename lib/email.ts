@@ -2,7 +2,20 @@ import { Resend } from 'resend';
 import { formatDateForTimezone } from './utils';
 import type { Reminder } from './db';
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+// Lazy initialization to avoid build-time errors
+let resendInstance: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendInstance) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is required');
+    }
+    resendInstance = new Resend(apiKey);
+  }
+  return resendInstance;
+}
+
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 /**
@@ -17,6 +30,7 @@ export async function sendEgressReminder(reminder: Reminder): Promise<void> {
   const cancelUrl = `${appUrl}/api/cancel/${reminder.magic_hash}`;
   const deleteUrl = `${appUrl}/api/cancel/${reminder.magic_hash}?action=delete`;
 
+  const resend = getResendClient();
   const { error } = await resend.emails.send({
     from: 'Egress <noreply@egress.app>', // Update with your verified domain
     to: reminder.user_email,
@@ -115,6 +129,7 @@ export async function sendConfirmationEmail(reminder: Reminder): Promise<void> {
 
   const cancelUrl = `${appUrl}/api/cancel/${reminder.magic_hash}`;
 
+  const resend = getResendClient();
   const { error } = await resend.emails.send({
     from: 'Egress <noreply@egress.app>', // Update with your verified domain
     to: reminder.user_email,
