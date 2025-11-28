@@ -38,9 +38,23 @@ function getSupabaseAdminClient(): SupabaseClient {
 }
 
 // Client for client-side operations (uses anon key)
-// Note: These are only initialized when actually used (lazy loading)
-// For server-side operations, use the getSupabaseAdminClient() function
-export { getSupabaseClient as supabase, getSupabaseAdminClient as supabaseAdmin };
+// Using Proxy to defer initialization until runtime (avoids build-time errors)
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseClient();
+    const value = (client as any)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  }
+});
+
+// Admin client for server-side operations (uses service role key)
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseAdminClient();
+    const value = (client as any)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  }
+});
 
 export type ReminderStatus = 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
 
