@@ -13,8 +13,20 @@ jobs:
     steps:
       - name: Call Cron Endpoint
         run: |
-          response=$(curl -s -w "\n%{http_code}" -X GET "${{ secrets.APP_URL }}/api/cron" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          # Ensure URL doesn't have trailing slash and has https://
+          APP_URL="${{ secrets.APP_URL }}"
+          APP_URL="${APP_URL%/}"  # Remove trailing slash
+          if [[ ! "$APP_URL" =~ ^https?:// ]]; then
+            APP_URL="https://${APP_URL}"
+          fi
+          
+          CRON_URL="${APP_URL}/api/cron"
+          
+          echo "Calling: $CRON_URL"
+          
+          response=$(curl -s -w "\n%{http_code}" -L -X GET "$CRON_URL" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "User-Agent: GitHub Actions")
           http_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
           
