@@ -13,7 +13,7 @@ Resend is an email API service that sends transactional emails. It's developer-f
 3. Click **Add New**
 4. Add:
    - **Key:** `RESEND_API_KEY`
-   - **Value:** `re_XNNGNQ1k_6sYxAFACEJ4mdoPgiUfxk7Si`
+   - **Value:** `your_resend_api_key_here` (get from https://resend.com/api-keys)
    - **Environment:** Select all (Production, Preview, Development)
 5. Click **Save**
 
@@ -71,7 +71,7 @@ If you want to use your own domain:
 
 ## Current API Key
 
-Your Resend API Key: `re_XNNGNQ1k_6sYxAFACEJ4mdoPgiUfxk7Si`
+⚠️ **Never commit API keys to git!** Always use environment variables.
 
 ⚠️ **Security Note:** Never commit API keys to git. Always use environment variables.
 
