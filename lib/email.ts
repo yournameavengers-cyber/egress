@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { formatDateForTimezone } from './utils';
 import type { Reminder } from './db';
+import { getCancellationUrl } from './cancellation-links';
 
 // Lazy initialization to avoid build-time errors
 let resendInstance: Resend | null = null;
@@ -27,8 +28,13 @@ export async function sendEgressReminder(reminder: Reminder): Promise<void> {
     reminder.timezone_offset
   );
 
-  const cancelUrl = `${appUrl}/api/cancel/${reminder.magic_hash}`;
-  const deleteUrl = `${appUrl}/api/cancel/${reminder.magic_hash}?action=delete`;
+  // Get the actual cancellation URL for the service
+  const serviceCancelUrl = getCancellationUrl(reminder.service_name);
+  
+  // Calculate money saved
+  const subscriptionPrice = reminder.subscription_price || 0;
+  const formattedPrice = subscriptionPrice.toFixed(2);
+  const moneySaved = `$${formattedPrice} → $0.00`;
 
   const resend = getResendClient();
   const { error } = await resend.emails.send({
@@ -61,24 +67,18 @@ export async function sendEgressReminder(reminder: Reminder): Promise<void> {
 
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 4px; margin: 30px 0; border: 1px solid #dee2e6;">
               <p style="margin: 0 0 10px 0; font-size: 14px; color: #6c757d; text-transform: uppercase; letter-spacing: 1px;">Money Saved if You Cancel Now</p>
-              <p style="margin: 0; font-size: 24px; font-weight: bold; color: #28a745;">$0.00 → $0.00</p>
+              <p style="margin: 0; font-size: 24px; font-weight: bold; color: #28a745;">${moneySaved}</p>
               <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">(Cancel before ${deadlineDate} to avoid charges)</p>
             </div>
 
             <div style="text-align: center; margin: 40px 0;">
-              <a href="${cancelUrl}" style="display: inline-block; background-color: #000; color: #fff; padding: 16px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; letter-spacing: 1px;">
+              <a href="${serviceCancelUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #000; color: #fff; padding: 16px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; letter-spacing: 1px;">
                 CANCEL NOW
               </a>
             </div>
 
             <p style="font-size: 14px; color: #6c757d; text-align: center; margin-top: 30px;">
-              This link will help you cancel your subscription to ${reminder.service_name}.
-            </p>
-
-            <hr style="border: none; border-top: 1px solid #dee2e6; margin: 40px 0;" />
-
-            <p style="font-size: 12px; color: #6c757d; text-align: center; margin: 0;">
-              This wasn't you? <a href="${deleteUrl}" style="color: #6c757d; text-decoration: underline;">Delete this reminder</a>
+              This link will take you directly to ${reminder.service_name}'s cancellation page.
             </p>
           </div>
 
@@ -99,9 +99,9 @@ Your trial for ${reminder.service_name} ends on ${deadlineDate}.
 
 If you do nothing, you will be charged automatically. This is your 48-hour warning.
 
-Cancel now: ${cancelUrl}
+Money saved if you cancel: ${moneySaved}
 
-This wasn't you? Delete this reminder: ${deleteUrl}
+Cancel now: ${serviceCancelUrl}
 
 ---
 Egress - Privacy-First Anti-Subscription Tool

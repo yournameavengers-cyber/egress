@@ -11,6 +11,7 @@ interface FormData {
   service: string;
   date: string;
   email: string;
+  price: string;
 }
 
 interface ReminderResponse {
@@ -31,7 +32,8 @@ export default function EgressInterface() {
   const [formData, setFormData] = useState<FormData>({
     service: '',
     date: '',
-    email: ''
+    email: '',
+    price: ''
   });
   const [safeMode, setSafeMode] = useState(true);
   const [timezone, setTimezone] = useState<string>('');
@@ -67,7 +69,7 @@ export default function EgressInterface() {
   };
 
   const handleArm = async () => {
-    if (!formData.service || !formData.date || !formData.email) {
+    if (!formData.service || !formData.date || !formData.email || !formData.price) {
       setError('Please fill in all fields');
       return;
     }
@@ -87,6 +89,7 @@ export default function EgressInterface() {
           serviceName: formData.service,
           date: formData.date,
           email: formData.email,
+          subscriptionPrice: parseFloat(formData.price) || 0,
           timezoneOffset,
           safeMode
         }),
@@ -198,6 +201,23 @@ export default function EgressInterface() {
                   </span>
                   <span>.</span>
                 </div>
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span>Subscription costs</span>
+                  <span className="relative inline-block min-w-[150px] md:min-w-[200px]">
+                    <span className="absolute left-0 top-0 pointer-events-none text-white/40 font-mono text-3xl md:text-5xl pb-2">$</span>
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="0.00"
+                      value={formData.price}
+                      onChange={handleInput}
+                      step="0.01"
+                      min="0"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2 pl-6"
+                    />
+                  </span>
+                  <span>per month.</span>
+                </div>
               </div>
 
               {/* Quick Date Chips */}
@@ -249,7 +269,7 @@ export default function EgressInterface() {
               <div className="pt-8 pb-4">
                 <button
                   onClick={handleArm}
-                  disabled={!formData.service || !formData.date || !formData.email}
+                  disabled={!formData.service || !formData.date || !formData.email || !formData.price}
                   className="group relative flex items-center space-x-4 pl-1 pr-6 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed overflow-hidden backdrop-blur-md"
                 >
                   <span className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-black group-hover:scale-110 transition-transform">
@@ -332,7 +352,7 @@ export default function EgressInterface() {
               <button
                 onClick={() => {
                   setStep('input');
-                  setFormData({ service: '', date: '', email: '' });
+                  setFormData({ service: '', date: '', email: '', price: '' });
                   setReminderData(null);
                 }}
                 className="mt-8 w-full text-center text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase transition-colors"

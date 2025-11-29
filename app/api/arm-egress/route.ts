@@ -13,7 +13,7 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { serviceName, date, email, timezoneOffset, safeMode = true } = body;
+    const { serviceName, date, email, subscriptionPrice, timezoneOffset, safeMode = true } = body;
 
     // Validation
     if (!serviceName || typeof serviceName !== 'string') {
@@ -33,6 +33,21 @@ export async function POST(request: NextRequest) {
     if (!email || typeof email !== 'string') {
       return NextResponse.json(
         { error: 'Email is required' },
+        { status: 400 }
+      );
+    }
+
+    if (subscriptionPrice === undefined || subscriptionPrice === null) {
+      return NextResponse.json(
+        { error: 'Subscription price is required' },
+        { status: 400 }
+      );
+    }
+
+    const price = parseFloat(subscriptionPrice);
+    if (isNaN(price) || price < 0) {
+      return NextResponse.json(
+        { error: 'Invalid subscription price' },
         { status: 400 }
       );
     }
@@ -79,7 +94,8 @@ export async function POST(request: NextRequest) {
       trial_end_utc: trialEndUTC,
       egress_trigger_utc: egressTriggerUTC,
       timezone_offset: tzOffset,
-      magic_hash: magicHash
+      magic_hash: magicHash,
+      subscription_price: price
     });
 
     // Send confirmation email (don't await - fire and forget for faster response)

@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         processed: 0,
         debug: {
           currentTime: new Date().toISOString(),
-          recentReminders: allReminders.data || []
+          recentReminders: allReminders || []
         }
       });
     }

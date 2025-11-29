@@ -67,6 +67,7 @@ export interface Reminder {
   status: ReminderStatus;
   timezone_offset: number;
   magic_hash: string;
+  subscription_price: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -78,6 +79,7 @@ export interface CreateReminderInput {
   egress_trigger_utc: Date;
   timezone_offset: number;
   magic_hash: string;
+  subscription_price: number | null;
 }
 
 /**
@@ -94,6 +96,7 @@ export async function createReminder(input: CreateReminderInput): Promise<Remind
       egress_trigger_utc: input.egress_trigger_utc.toISOString(),
       timezone_offset: input.timezone_offset,
       magic_hash: input.magic_hash,
+      subscription_price: input.subscription_price,
       status: 'pending'
     })
     .select()
