@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   getPendingReminders,
   lockReminderForProcessing,
-  updateReminderStatus
+  updateReminderStatus,
+  supabaseAdmin
 } from '@/lib/db';
 import { sendEgressReminder } from '@/lib/email';
 
@@ -37,11 +38,24 @@ export async function GET(request: NextRequest) {
     // Get all pending reminders that are ready
     const pendingReminders = await getPendingReminders();
 
+    console.log(`[Cron] Found ${pendingReminders.length} pending reminders ready to process`);
+    
     if (pendingReminders.length === 0) {
+      // Also check if there are any reminders at all (for debugging)
+      const { data: allReminders } = await supabaseAdmin
+        .from('reminders')
+        .select('id, status, egress_trigger_utc, user_email, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
       return NextResponse.json({
         success: true,
         message: 'No pending reminders to process',
-        processed: 0
+        processed: 0,
+        debug: {
+          currentTime: new Date().toISOString(),
+          recentReminders: allReminders.data || []
+        }
       });
     }
 
@@ -55,24 +69,29 @@ export async function GET(request: NextRequest) {
     // Process each reminder
     for (const reminder of pendingReminders) {
       try {
+        console.log(`[Cron] Processing reminder ${reminder.id} for ${reminder.user_email}`);
+        
         // Try to lock the reminder for processing (atomic operation)
         const lockedReminder = await lockReminderForProcessing(reminder.id);
 
         // If lock failed, another process is handling it
         if (!lockedReminder) {
+          console.log(`[Cron] Reminder ${reminder.id} already locked by another process`);
           results.skipped++;
           continue;
         }
 
+        console.log(`[Cron] Sending email for reminder ${reminder.id}`);
         // Send the email
         await sendEgressReminder(lockedReminder);
+        console.log(`[Cron] Email sent successfully for reminder ${reminder.id}`);
 
         // Mark as sent
         await updateReminderStatus(lockedReminder.id, 'sent');
         results.sent++;
         results.processed++;
       } catch (error) {
-        console.error(`Failed to process reminder ${reminder.id}:`, error);
+        console.error(`[Cron] Failed to process reminder ${reminder.id}:`, error);
 
         // Try to mark as failed (only if we successfully locked it)
         try {
