@@ -73,3 +73,4 @@ The GitHub Actions workflow will automatically run every 10 minutes to process r
 - **Database errors**: Ensure the migration has been run in Supabase
 - **Cron not working**: Check GitHub Actions secrets are set correctly
 
+

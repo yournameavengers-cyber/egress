@@ -32,7 +32,7 @@ export async function sendEgressReminder(reminder: Reminder): Promise<void> {
 
   const resend = getResendClient();
   const { error } = await resend.emails.send({
-    from: 'Egress <noreply@egress.app>', // Update with your verified domain
+    from: 'Egress <onboarding@resend.dev>', // Using Resend test domain - update to your verified domain for production
     to: reminder.user_email,
     subject: `⚠️ ACT NOW: Cancel ${reminder.service_name} within 48 hours`,
     html: `
@@ -131,7 +131,7 @@ export async function sendConfirmationEmail(reminder: Reminder): Promise<void> {
 
   const resend = getResendClient();
   const { error } = await resend.emails.send({
-    from: 'Egress <noreply@egress.app>', // Update with your verified domain
+    from: 'Egress <onboarding@resend.dev>', // Using Resend test domain - update to your verified domain for production
     to: reminder.user_email,
     subject: `Egress Protocol Armed: ${reminder.service_name}`,
     html: `
