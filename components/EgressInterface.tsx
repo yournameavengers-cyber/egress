@@ -121,7 +121,7 @@ export default function EgressInterface() {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-black overflow-y-auto flex items-center justify-center font-sans text-white selection:bg-cyan-500/30 py-12 md:py-20">
+    <div className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center font-sans text-white selection:bg-cyan-500/30 py-4 md:py-6">
       {/* 1. ATMOSPHERE: The Sora-style Aurora Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-900/30 rounded-full blur-[120px] mix-blend-screen animate-pulse-slow" />
@@ -133,78 +133,71 @@ export default function EgressInterface() {
       </div>
 
       {/* 2. THE LENS: The Glass Interface */}
-      <div className="relative z-10 w-full max-w-2xl px-6 py-8">
+      <div className="relative z-10 w-full max-w-2xl px-6 py-2 md:py-4">
         <AnimatePresence mode="wait">
           {step === 'input' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-              className="space-y-8 md:space-y-12"
+              className="space-y-3 md:space-y-4"
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-8 md:mb-12">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <div className="flex items-center mb-8 md:mb-12">
+                <div className="flex items-center space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                   <span className="text-sm md:text-base tracking-[0.2em] font-mono uppercase text-white/80">Egress Protocol v1.0</span>
                 </div>
-                {timezone && (
-                  <span className="text-sm md:text-base tracking-[0.2em] font-mono uppercase text-white/70">
-                    {timezone}
-                  </span>
-                )}
               </div>
 
               {/* The "Sentence Builder" */}
-              <div className="text-3xl md:text-5xl leading-[1.5] font-light tracking-tight text-white/90 space-y-4 md:space-y-6">
+              <div className="text-xl md:text-2xl leading-tight font-light tracking-tight text-white/90 space-y-2 md:space-y-3">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span>I need to escape from</span>
-                  <span className="relative inline-block min-w-[280px] md:min-w-[350px]">
+                  <span className="relative inline-block min-w-[200px] md:min-w-[280px]">
                     <input
                       type="text"
                       name="service"
                       placeholder="Subscription Name"
                       value={formData.service}
                       onChange={handleInput}
-                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-xl md:text-2xl pb-2"
                       autoComplete="off"
                     />
                   </span>
                 </div>
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span>before</span>
-                  <span className="relative inline-block min-w-[200px] md:min-w-[250px]">
+                  <span className="relative inline-block min-w-[150px] md:min-w-[200px]">
                     <input
                       type="date"
                       name="date"
                       value={formData.date}
                       onChange={handleDateChange}
-                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-xl md:text-2xl pb-2"
                       style={{
                         colorScheme: 'dark'
                       }}
                     />
                   </span>
-                  <span>.</span>
                 </div>
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span>Send the signal to</span>
-                  <span className="relative inline-block min-w-[280px] md:min-w-[350px]">
+                  <span className="relative inline-block min-w-[200px] md:min-w-[280px]">
                     <input
                       type="email"
                       name="email"
                       placeholder="my@email.com"
                       value={formData.email}
                       onChange={handleInput}
-                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-xl md:text-2xl pb-2"
                     />
                   </span>
-                  <span>.</span>
                 </div>
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span>Subscription costs</span>
-                  <span className="relative inline-block min-w-[150px] md:min-w-[200px]">
-                    <span className="absolute left-0 top-0 pointer-events-none text-white/40 font-mono text-3xl md:text-5xl pb-2">$</span>
+                  <span className="relative inline-flex items-baseline min-w-[120px] md:min-w-[150px]">
+                    <span className="text-cyan-200 font-mono text-xl md:text-2xl pb-2 border-b-2 border-transparent">$</span>
                     <input
                       type="number"
                       name="price"
@@ -213,16 +206,15 @@ export default function EgressInterface() {
                       onChange={handleInput}
                       step="0.01"
                       min="0"
-                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 w-full transition-all font-mono text-3xl md:text-5xl pb-2 pl-6"
+                      className="bg-transparent border-b-2 border-white/20 text-cyan-200 placeholder:text-white/40 placeholder:font-normal focus:outline-none focus:border-cyan-400 flex-1 transition-all font-mono text-xl md:text-2xl pb-2 ml-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </span>
-                  <span>per month.</span>
                 </div>
               </div>
 
               {/* Quick Date Chips */}
               {!formData.date && (
-                <div className="flex flex-wrap gap-3 pt-4">
+                <div className="flex flex-wrap gap-2 pt-2">
                   <button
                     onClick={() => handleQuickDate(7)}
                     className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-mono transition-all backdrop-blur-md"
@@ -245,7 +237,7 @@ export default function EgressInterface() {
               )}
 
               {/* Safe Mode Toggle */}
-              <div className="flex items-center space-x-3 pt-6">
+              <div className="flex items-center space-x-2 pt-2">
                 <input
                   type="checkbox"
                   id="safeMode"
@@ -266,16 +258,16 @@ export default function EgressInterface() {
               )}
 
               {/* The Trigger Button */}
-              <div className="pt-8 pb-4">
+              <div className="pt-4 pb-2">
                 <button
                   onClick={handleArm}
                   disabled={!formData.service || !formData.date || !formData.email || !formData.price}
                   className="group relative flex items-center space-x-4 pl-1 pr-6 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed overflow-hidden backdrop-blur-md"
                 >
-                  <span className="flex items-center justify-center w-12 h-12 bg-white rounded-full text-black group-hover:scale-110 transition-transform">
-                    <ArrowRight size={20} />
+                  <span className="flex items-center justify-center w-10 h-10 bg-white rounded-full text-black group-hover:scale-110 transition-transform">
+                    <ArrowRight size={18} />
                   </span>
-                  <span className="font-mono text-sm tracking-widest uppercase">
+                  <span className="font-mono text-xs tracking-widest uppercase">
                     Initialize Sequence
                   </span>
                   {/* Glowing Effect on Hover */}
