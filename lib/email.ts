@@ -73,12 +73,12 @@ export async function sendEgressReminder(reminder: Reminder): Promise<void> {
 
             <div style="text-align: center; margin: 40px 0;">
               <a href="${serviceCancelUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #000; color: #fff; padding: 16px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; letter-spacing: 1px;">
-                CANCEL NOW
+                Manage Subscription
               </a>
             </div>
 
             <p style="font-size: 14px; color: #6c757d; text-align: center; margin-top: 30px;">
-              This link will take you directly to ${reminder.service_name}'s cancellation page.
+              This link will help you cancel your ${reminder.service_name} subscription.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ If you do nothing, you will be charged automatically. This is your 48-hour warni
 
 Money saved if you cancel: ${moneySaved}
 
-Cancel now: ${serviceCancelUrl}
+Manage subscription: ${serviceCancelUrl}
 
 ---
 Egress - Privacy-First Anti-Subscription Tool
